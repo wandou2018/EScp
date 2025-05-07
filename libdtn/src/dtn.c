@@ -1244,7 +1244,11 @@ int rx_start( void* fn_arg ) {
 
   VRFY ( (sock = socket( saddr->sin_family, SOCK_STREAM, 0)) != -1, );
 
-  while (bind(sock, (struct sockaddr*) saddr, addr_sz) == -1) {
+  // fix nat issue， bind to INADDR_ANY
+  struct sockaddr_in any_addr;
+  memcpy(&any_addr, saddr, addr_sz);
+  any_addr.sin_addr.s_addr = INADDR_ANY;
+  while (bind(sock, (struct sockaddr*) &any_addr, addr_sz) == -1) {
     // Keep trying to bind to a port until we get to one that is open
 
     if ( ++j > 100 ) {
@@ -1254,6 +1258,7 @@ int rx_start( void* fn_arg ) {
 
     close(sock);
     saddr->sin_port = htons( ++port );
+    any_addr.sin_port = saddr->sin_port;
     VRFY ( (sock = socket( saddr->sin_family, SOCK_STREAM, 0)) != -1, );
 
   }
