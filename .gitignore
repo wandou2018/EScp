@@ -1,0 +1,9 @@
+# IDE
+.idea/
+.vs/
+.vscode/
+.clangd/
+
+# cargo target
+target
+Cargo.lock
